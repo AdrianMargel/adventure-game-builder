@@ -12,14 +12,6 @@ class Scenario{
  		}
  		return null;
  	}
- 	getQuestion(questionId){
-		let i;
- 		for(i=0;i<this.questions.length;i++){
- 			if(this.questions[i].id==questionId)
- 				return this.questions[i];
- 		}
- 		return null;
- 	}
  	addScene(toAdd){
  		this.scenes.push(toAdd);
  	}
@@ -29,24 +21,6 @@ class Scenario{
 }
 
 class Scene{
-	constructor(id,questionId,title,body) {
-		this.id=id;
-		this.title=title;
-		this.body=body;
-		//this.img="test.png";
-		this.icon="img/icon.png";
-		this.questionId=questionId;
-	}
-	getSmallHTML(){
-		return "<div class='choiceSmall'><div class='choiceIcon' style=\"background-image: url('"+this.icon+"')\"></div><p class='choiceSmallTitle'>"+this.title+"</p></div>";
-	}
-	getHTML(){
-	 	return "<div class='scene'>"+this.body+"</div>"+
-	 		"<div class='center'><button class='sceneNext' onclick=\"selectQuestion('"+this.questionId+"')\">continue</button></div>";
-	}
-}
-
-class Question{
 	constructor(id,question) {
 		this.id=id;
 		this.question=question;
