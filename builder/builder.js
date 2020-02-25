@@ -509,8 +509,10 @@ var marginX=20;
 var marginY=20;
 
 var zoomBase=1.1;
-var zoomExp=1;
+var zoomExp=0;
 var zoom=Math.pow(zoomBase,zoomExp);
+var minZoom=-30;
+var maxZoom=20;
 var moveSpeed=18;
 var cam=new Vector(0,0);
 
@@ -801,8 +803,7 @@ function wheelMoved(event) {
   if(!enableControls){
     return;
   }
-  console.log(event);
-  zoomExp-=Math.max(-2,Math.min(2,event.deltaY));
+  zoomExp=Math.min(maxZoom,Math.max(minZoom,zoomExp-Math.max(-2,Math.min(2,event.deltaY))));
   event.preventDefault();
   cam.subVec(new Vector(realMouse));
   cam.sclVec(1/zoom);
