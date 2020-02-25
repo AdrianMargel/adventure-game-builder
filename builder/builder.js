@@ -300,8 +300,14 @@ class Box{
     slot.emptySlot();
     return held;
   }
-  update(){
-    
+  removeBox(grabBox){
+    let slot=this.getSlotBox(grabBox);
+    if(slot!=null){
+      let held=slot.getHeld();
+      slot.emptySlot();
+      return held;
+    }
+    return null;
   }
   drop(toDrop,dropPos){
     let slot=this.getSlot(dropPos);
@@ -326,9 +332,22 @@ class Box{
     }
     return null;
   }
+  getSlotBox(target){
+    let i;
+    for(i=this.slots.length-1;i>=0;i--){
+      if(this.slots[i].getHeld()===target){
+        return this.slots[i];
+      }
+    }
+    return null;
+  }
   
   getType(){
     return this.type;
+  }
+
+  update(){
+    
   }
   
   display(){
@@ -736,7 +755,25 @@ function deleteSoftSelect(){
     softSelect=null;
   }
 }
+function killBox(toKill){
+  let i;
+  for(i=allBoxes.length-1;i>=0;i--){
+    if(allBoxes[i]===toKill){
+      allBoxes[i].kill();
+      allBoxes.splice(i,1);
+      return;
+    }
+  }
 
+  for(i=allBoxes.length-1;i>=0;i--){
+    let removed=allBoxes[i].removeBox(toKill);
+    if(removed!=null){
+      removed.kill();
+      allBoxes[i].update();
+      return;
+    }
+  }
+}
 function killCons(toKill){
   console.log(toKill);
   let i;
@@ -745,15 +782,6 @@ function killCons(toKill){
       allCons.splice(i,1);
     }else if(allCons[i].getEnd()===toKill){
       allCons[i].reset();
-    }
-  }
-}
-function killBox(toKill){
-  for(i=allBoxes.length-1;i>=0;i--){
-    if(allBoxes[i]===toKill){
-      allBoxes[i].kill();
-      allBoxes.splice(i,1);
-      return;
     }
   }
 }
