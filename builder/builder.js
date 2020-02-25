@@ -228,6 +228,18 @@ class Box{
       this.con=null;
     }
   }
+
+  kill(){
+    //you only need to delete the connections as nested boxes are not part of the global array
+    killCons(this);
+    let i;
+    for(i=0;i<this.slots.length;i++){
+      let held=this.slots[i].getHeld();
+      if(held!=null){
+        held.kill();
+      }
+    }
+  }
   
   getCon(){
     return this.con;
@@ -723,8 +735,8 @@ function deleteSoftSelect(){
   }
 }
 
-function killBox(toKill){
-  console.log("kill");
+function killCons(toKill){
+  console.log(toKill);
   let i;
   for(i=allCons.length-1;i>=0;i--){
     if(allCons[i].getStart()===toKill){
@@ -733,8 +745,11 @@ function killBox(toKill){
       allCons[i].reset();
     }
   }
+}
+function killBox(toKill){
   for(i=allBoxes.length-1;i>=0;i--){
     if(allBoxes[i]===toKill){
+      allBoxes[i].kill();
       allBoxes.splice(i,1);
       return;
     }
