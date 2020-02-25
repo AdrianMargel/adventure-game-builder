@@ -342,7 +342,7 @@ class Box{
       drawLine(tri1.x,tri1.y,tri3.x,tri3.y);
     }
     fill("#000000");
-    drawText(this.type,this.pos.x+this.size.x/2,this.pos.y+20,18);
+    drawText(this.type,this.pos.x+this.size.x/2,this.pos.y+20);
   }
 }
 
@@ -434,7 +434,11 @@ function noStroke(){
 }
 
 
-function drawText(text,x,y,size){
+function drawText(text,x,y){
+  ctx.fillStyle = fillVar;
+  ctx.font = 18*zoom+"px Arial";
+  ctx.textAlign = "center";
+  ctx.fillText(text, x*zoom+cam.x,y*zoom+cam.y); 
   //textAlign(CENTER);
   //textSize(size*zoom);
   //text(text,x*zoom+cam.x,y*zoom+cam.y);
@@ -465,6 +469,14 @@ function drawCircle(x, y, d){
   ctx.stroke(); 
   //ellipse(x*zoom+cam.x,y*zoom+cam.y,w*zoom,h*zoom);
 }
+function drawBackground(){
+  let canvasSize = canvas.getBoundingClientRect();
+  ctx.fillStyle = fillVar;
+  ctx.beginPath();
+  ctx.rect(0,0,canvasSize.width,canvasSize.height);
+  ctx.fill();
+  //ctx.fillRect(x*zoom+cam.x,y*zoom+cam.y,w*zoom,h*zoom);
+}
 
 var allBoxes=[];
 var allCons=[];
@@ -477,7 +489,7 @@ var nodeSize=15;
 var marginX=20;
 var marginY=20;
 
-var zoomBase=1.2;
+var zoomBase=1.1;
 var zoomExp=1;
 var zoom=Math.pow(zoomBase,zoomExp);
 var cam=new Vector(0,0);
@@ -501,8 +513,13 @@ setInterval(()=>{draw()},framerate);
 document.onmousemove = handleMouseMove;
 document.onmousedown = mousePressed;
 document.onmouseup = mouseReleased;
+canvas.onwheel = wheelMoved;
+document.onkeypress=keyPressed;
+document.onkeyup=keyReleased;
+window.addEventListener("resize", resize);
 
 function setup(){
+  resize();
   noStroke();
   noFill();
   //size(800,800);
@@ -520,7 +537,7 @@ function setup(){
   allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
   
   let template=new Slot(new Vector(0,0),new Vector(230,80),"choice");
-  allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"test",false,true,template,50));
+  allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"scene",false,true,template,50));
   
   initCons();
 }
@@ -528,8 +545,8 @@ function draw(){
   //println(frameRate);
   //background(255);
   noStroke();
-  fill("#ffffff");
-  drawRect(0,0,800,800);
+  fill("#DfDfDf");
+  drawBackground();
   if(selected!=null){
     let toSet=getMouse();
     toSet.subVec(grabPos);
@@ -569,7 +586,11 @@ function draw(){
   fill("#00A0A0");
   drawRect(getMouse().x,getMouse().y,10,10);
 }
-
+function resize(){
+  console.log(canvas,window);
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight-100;
+}
 function mousePressed(){
   mouseDown(getMouse());
 }
@@ -664,7 +685,9 @@ function getOverCon(pos){
   return null;
 }
 
-function keyPressed(key){
+function keyPressed(event){
+  console.log(event);
+  let key=event.key;
   if(key=='w'||key=='W'){
     WDown=true;
   }
@@ -678,7 +701,9 @@ function keyPressed(key){
     DDown=true;
   }
 }
-function keyReleased(key){
+function keyReleased(event){
+  console.log(event);
+  let key=event.key;
   if(key=='w'||key=='W'){
     WDown=false;
   }
@@ -692,14 +717,13 @@ function keyReleased(key){
     DDown=false;
   }
 }
-function mouseWheel(e) {
-  zoomExp-=e;
+function wheelMoved(event) {  zoomExp-=event.deltaY;
   
-  //cam.subVec(new Vector(mouseX,mouseY));
+  cam.subVec(new Vector(realMouse));
   cam.sclVec(1/zoom);
-  zoom=pow(zoomBase,zoomExp);
+  zoom=Math.pow(zoomBase,zoomExp);
   cam.sclVec(zoom);
-  //cam.addVec(new Vector(mouseX,mouseY));
+  cam.addVec(new Vector(realMouse));
 }
 
 function remove(arr,toRemove){
