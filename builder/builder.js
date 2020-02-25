@@ -178,6 +178,12 @@ class Connection{
       return target.getMag(this.endPos)<nodeSize/2||target.getMag(this.startPos)<nodeSize/2;
     }
   }
+  getStart(){
+    return this.start;
+  }
+  getEnd(){
+    return this.end;
+  }
   display(){
     if(this.endPos!=null){
       stroke("#000000");
@@ -516,7 +522,7 @@ document.onmousemove = handleMouseMove;
 document.onmousedown = mousePressed;
 document.onmouseup = mouseReleased;
 canvas.onwheel = wheelMoved;
-document.onkeypress=keyPressed;
+document.onkeydown=keyPressed;
 document.onkeyup=keyReleased;
 window.addEventListener("resize", resize);
 
@@ -710,6 +716,31 @@ function getOverCon(pos){
   return null;
 }
 
+function deleteSoftSelect(){
+  if(softSelect){
+    killBox(softSelect);
+    softSelect=null;
+  }
+}
+
+function killBox(toKill){
+  console.log("kill");
+  let i;
+  for(i=allCons.length-1;i>=0;i--){
+    if(allCons[i].getStart()===toKill){
+      allCons.splice(i,1);
+    }else if(allCons[i].getEnd()===toKill){
+      allCons[i].reset();
+    }
+  }
+  for(i=allBoxes.length-1;i>=0;i--){
+    if(allBoxes[i]===toKill){
+      allBoxes.splice(i,1);
+      return;
+    }
+  }
+}
+
 function keyPressed(event){
   if(!enableControls){
     return;
@@ -726,6 +757,10 @@ function keyPressed(event){
   }
   if(key=='d'||key=='D'){
     DDown=true;
+  }
+
+  if(key=='Delete'){
+    deleteSoftSelect();
   }
 }
 function keyReleased(event){
