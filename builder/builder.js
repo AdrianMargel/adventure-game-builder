@@ -1,3 +1,19 @@
+class Scenario{
+
+}
+class SceneSolo{
+  //int USID //universal scenario Identifier
+}
+class SceneQuestion{
+  //int USID //universal scenario Identifier
+
+}
+class Choice{
+  //int USID //universal scenario Identifier
+
+}
+
+//---------------------------------------------
 class Vector {
   constructor(xOrVec,y,angleInit) {
     if(arguments.length == 1) {
@@ -564,26 +580,11 @@ function setup(){
   noStroke();
   noFill();
   //size(800,800);
-  allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
-  allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
-  allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
-  //Box toAdd=new Box(new Vector(50,120),new Vector(250,220),"question",false,true);
-  //toAdd.addSlot(new Slot(new Vector(10+50,10+120),new Vector(230,80),"choice",true));
-  //toAdd.addSlot(new Slot(new Vector(10+50,100+120),new Vector(230,80),"choice",true));
-  //allBoxes.add(toAdd);
-  allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
-  allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
-  allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
-  allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
-  allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
-  
-  let template=new Slot(new Vector(0,0),new Vector(230,80),"choice");
-  allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"scene",false,true,template,50));
-
-  let template2=new Slot(new Vector(0,0),new Vector(230,80),"choice");
-  allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"scene",false,true,template2,50));
-  
-  initCons();
+  // allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
+  // allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
+  // let template=new Slot(new Vector(0,0),new Vector(230,80),"choice");
+  // allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"scene",false,true,template,50));
+  // initCons();
 }
 function draw(){
   //println(frameRate);
@@ -635,6 +636,47 @@ function draw(){
   //fill("#00A0A0");
   //drawRect(getMouse().x,getMouse().y,10,10);
 }
+
+function newScene(){
+  let spawnPos=getScreenCenter();
+  let size=new Vector(230,80);
+  let half=new Vector(size);
+  half.sclVec(0.5);
+  spawnPos.subVec(half);
+
+  let addBox=new Box(spawnPos,size,"scene",true,true);
+  allBoxes.push(addBox);
+  initConsBox(addBox);
+}
+function newQuestion(){
+  let spawnPos=getScreenCenter();
+  let topGap=50;
+  let slotSize=new Vector(230,80);
+  let size=new Vector(slotSize);
+  size.addVec(new Vector(marginX*2,topGap+marginY));
+
+  let half=new Vector(size);
+  half.sclVec(0.5);
+  spawnPos.subVec(half);
+
+  let template=new Slot(new Vector(0,0),slotSize,"choice");
+  let addBox=new InfiniteBox(spawnPos,new Vector(0,0),"scene",false,true,template,topGap);
+  allBoxes.push(addBox);
+  initConsBox(addBox);
+
+}
+function newChoice(){
+  let spawnPos=getScreenCenter();
+  let size=new Vector(230,80);
+  let half=new Vector(size);
+  half.sclVec(0.5);
+  spawnPos.subVec(half);
+
+  let addBox=new Box(spawnPos,size,"choice",true,false);
+  allBoxes.push(addBox);
+  initConsBox(addBox);
+}
+
 function resize(){
   canvas.width = document.getElementsByTagName("BODY")[0].offsetWidth;
   canvas.height = Math.max(window.innerHeight-200,200);
@@ -644,8 +686,8 @@ function mousePressed(){
 
   let mouse=new Vector(realMouse);
   let rect = canvas.getBoundingClientRect();
-  let minX=rect.x;
-  let minY=rect.y+scrollY;
+  let minX=0;
+  let minY=0;
   let maxX=minX+rect.width;
   let maxY=minY+rect.height;
   enableControls=(mouse.x>=minX&&mouse.x<=maxX && mouse.y>=minY&&mouse.y<=maxY);
@@ -668,14 +710,26 @@ function initCons(){
     allBoxes[i].addAllCons(allCons);
   }
 }
+function initConsBox(box){
+  box.addAllCons(allCons);
+}
+
 function update(){
   let i;
   for(i=allBoxes.length-1;i>=0;i--){
     allBoxes[i].update();
   }
 }
+function getScreenCenter(){
+  let rect = canvas.getBoundingClientRect();
+  let center=new Vector(rect.width,rect.height);
+  center.sclVec(0.5);
+  center.subVec(cam);
+  center.sclVec(1/zoom);
+  return center;
+}
 function handleMouseMove(event) {
-  var rect = canvas.getBoundingClientRect();
+  let rect = canvas.getBoundingClientRect();
   realMouse=new Vector(event.clientX - rect.left, event.clientY - rect.top);
 }
 function getMouse(){
@@ -775,7 +829,6 @@ function killBox(toKill){
   }
 }
 function killCons(toKill){
-  console.log(toKill);
   let i;
   for(i=allCons.length-1;i>=0;i--){
     if(allCons[i].getStart()===toKill){
