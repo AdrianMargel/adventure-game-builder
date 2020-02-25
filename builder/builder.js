@@ -493,6 +493,7 @@ var marginY=20;
 var zoomBase=1.1;
 var zoomExp=1;
 var zoom=Math.pow(zoomBase,zoomExp);
+var moveSpeed=18;
 var cam=new Vector(0,0);
 
 var WDown;
@@ -514,7 +515,7 @@ setInterval(()=>{draw()},framerate);
 document.onmousemove = handleMouseMove;
 document.onmousedown = mousePressed;
 document.onmouseup = mouseReleased;
-canvas.onwheel = wheelMoved;
+document.onwheel = wheelMoved;
 document.onkeypress=keyPressed;
 document.onkeyup=keyReleased;
 window.addEventListener("resize", resize);
@@ -549,7 +550,7 @@ function draw(){
   if(enableControls){
     fill("#DfDfDf");
   }else{
-    fill("#D3D3D3");
+    fill("#C3C3C3");
   }
   drawBackground();
   if(selected!=null){
@@ -576,34 +577,37 @@ function draw(){
   }
   
   if(WDown){
-    cam.y+=15;
+    cam.y+=moveSpeed;
   }
   if(SDown){
-    cam.y-=15;
+    cam.y-=moveSpeed;
   }
   if(ADown){
-    cam.x+=15;
+    cam.x+=moveSpeed;
   }
   if(DDown){
-    cam.x-=15;
+    cam.x-=moveSpeed;
   }
 
-  fill("#00A0A0");
-  drawRect(getMouse().x,getMouse().y,10,10);
+  //to display mouse:
+  //fill("#00A0A0");
+  //drawRect(getMouse().x,getMouse().y,10,10);
 }
 function resize(){
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight-100;
+  canvas.width = document.getElementsByTagName("BODY")[0].offsetWidth;
+  canvas.height = window.innerHeight-200;
 }
 function mousePressed(){
+  let scrollY = window.scrollY
+
   let mouse=new Vector(realMouse);
   let rect = canvas.getBoundingClientRect();
   let minX=rect.x;
-  let minY=rect.y;
-  let maxX=rect.x+rect.width;
-  let maxY=rect.y+rect.height;
+  let minY=rect.y+scrollY;
+  let maxX=minX+rect.width;
+  let maxY=minY+rect.height;
   enableControls=(mouse.x>=minX&&mouse.x<=maxX && mouse.y>=minY&&mouse.y<=maxY);
-  
+
   if(!enableControls){
     return;
   }
@@ -740,8 +744,12 @@ function keyReleased(event){
     DDown=false;
   }
 }
-function wheelMoved(event) {  zoomExp-=event.deltaY;
-  
+function wheelMoved(event) {
+  if(!enableControls){
+    return;
+  }
+  zoomExp-=event.deltaY;
+  event.preventDefault();
   cam.subVec(new Vector(realMouse));
   cam.sclVec(1/zoom);
   zoom=Math.pow(zoomBase,zoomExp);
