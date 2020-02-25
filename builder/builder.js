@@ -515,7 +515,7 @@ setInterval(()=>{draw()},framerate);
 document.onmousemove = handleMouseMove;
 document.onmousedown = mousePressed;
 document.onmouseup = mouseReleased;
-document.onwheel = wheelMoved;
+canvas.onwheel = wheelMoved;
 document.onkeypress=keyPressed;
 document.onkeyup=keyReleased;
 window.addEventListener("resize", resize);
@@ -540,6 +540,9 @@ function setup(){
   
   let template=new Slot(new Vector(0,0),new Vector(230,80),"choice");
   allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"scene",false,true,template,50));
+
+  let template2=new Slot(new Vector(0,0),new Vector(230,80),"choice");
+  allBoxes.push(new InfiniteBox(new Vector(350,10),new Vector(230,80),"scene",false,true,template2,50));
   
   initCons();
 }
@@ -595,7 +598,7 @@ function draw(){
 }
 function resize(){
   canvas.width = document.getElementsByTagName("BODY")[0].offsetWidth;
-  canvas.height = window.innerHeight-200;
+  canvas.height = Math.max(window.innerHeight-200,200);
 }
 function mousePressed(){
   let scrollY = window.scrollY
@@ -748,7 +751,8 @@ function wheelMoved(event) {
   if(!enableControls){
     return;
   }
-  zoomExp-=event.deltaY;
+  console.log(event);
+  zoomExp-=Math.max(-2,Math.min(2,event.deltaY));
   event.preventDefault();
   cam.subVec(new Vector(realMouse));
   cam.sclVec(1/zoom);
