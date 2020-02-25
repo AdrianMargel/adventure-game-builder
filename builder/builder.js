@@ -484,6 +484,7 @@ var selected=null;
 var selectedCon=null;
 var grabPos;
 var softSelect=null;
+var enableControls=true;
 
 var nodeSize=15;
 var marginX=20;
@@ -545,7 +546,11 @@ function draw(){
   //println(frameRate);
   //background(255);
   noStroke();
-  fill("#DfDfDf");
+  if(enableControls){
+    fill("#DfDfDf");
+  }else{
+    fill("#D3D3D3");
+  }
   drawBackground();
   if(selected!=null){
     let toSet=getMouse();
@@ -587,14 +592,27 @@ function draw(){
   drawRect(getMouse().x,getMouse().y,10,10);
 }
 function resize(){
-  console.log(canvas,window);
   canvas.width = window.innerWidth;
   canvas.height = window.innerHeight-100;
 }
 function mousePressed(){
+  let mouse=new Vector(realMouse);
+  let rect = canvas.getBoundingClientRect();
+  let minX=rect.x;
+  let minY=rect.y;
+  let maxX=rect.x+rect.width;
+  let maxY=rect.y+rect.height;
+  enableControls=(mouse.x>=minX&&mouse.x<=maxX && mouse.y>=minY&&mouse.y<=maxY);
+  
+  if(!enableControls){
+    return;
+  }
   mouseDown(getMouse());
 }
 function mouseReleased(){
+  if(!enableControls){
+    return;
+  }
   mouseUp(getMouse());
 }
 
@@ -686,7 +704,9 @@ function getOverCon(pos){
 }
 
 function keyPressed(event){
-  console.log(event);
+  if(!enableControls){
+    return;
+  }
   let key=event.key;
   if(key=='w'||key=='W'){
     WDown=true;
@@ -702,7 +722,10 @@ function keyPressed(event){
   }
 }
 function keyReleased(event){
-  console.log(event);
+  if(!enableControls){
+    return;
+  }
+
   let key=event.key;
   if(key=='w'||key=='W'){
     WDown=false;
