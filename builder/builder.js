@@ -639,7 +639,7 @@ function draw(){
 
 function newScene(){
   let spawnPos=getScreenCenter();
-  let size=new Vector(230,80);
+  let size=new Vector(250,100);
   let half=new Vector(size);
   half.sclVec(0.5);
   spawnPos.subVec(half);
