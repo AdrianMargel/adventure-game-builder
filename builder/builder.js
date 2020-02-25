@@ -857,6 +857,10 @@ function keyPressed(event){
     DDown=true;
   }
 
+  if(key=='Tab'){
+    enableControls=false;
+  }
+
   if(key=='Delete'){
     deleteSoftSelect();
   }
