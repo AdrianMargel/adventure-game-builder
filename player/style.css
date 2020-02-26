@@ -1,0 +1,14 @@
+body{
+	margin: 0;
+}
+.editTop{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	display: flex;
+	justify-content: flex-start;
+}
+.contain{
+	max-width: 1024px;
+	margin-right: auto;
+	margin-left: auto;
+}

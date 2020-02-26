@@ -1,4 +1,81 @@
 
+class Scenario{
+  //int scenarioId
+  //ArrayList<> data
+  constructor(){
+    this.data=[];
+  }
+}
+
+//USId = universal scenario Identifier
+class Start{
+  //String editType
+  //int USId
+
+  //String name
+  //String title
+  //String description
+  //media<<>>
+
+  //int nextScene (USId)
+  constructor(){
+    this.editType="start";
+    this.USId=null;
+  }
+}
+class SceneSolo{
+  //String editType
+  //int USId
+
+  //String name
+  //String title
+  //String description
+  //media<<>>
+
+  //int nextScene (USId)
+  constructor(){
+    this.editType="sceneSolo";
+    this.USId=null;
+    this.name="new scene";
+    this.title="title";
+    this.description="description";
+  }
+}
+class SceneQuestion{
+  //String editType
+  //int USId
+
+  //String name
+  //String title
+  //String description
+  //media<<>>
+
+  //ArrayList<Choice> choices
+  constructor(){
+    this.editType="sceneQuestion";
+    this.USId=null;
+    this.name="new scene";
+    this.title="title";
+    this.description="description"; 
+  }
+
+}
+class Choice{
+  //String editType
+  //int USId
+
+  //String name
+  //String description 
+  //effects<<>>
+
+  //int nextScene (USId)
+  constructor(){
+    this.editType="choice";
+    this.USId=null;
+    this.name="new choice";
+    this.description="description"; 
+  }
+}
 class Vector {
   constructor(xOrVec,y,angleInit) {
     if(arguments.length == 1) {
@@ -608,6 +685,12 @@ function setup(){
   noStroke();
   noFill();
   //size(800,800);
+
+  let startData=new Start();
+  console.log(startData)
+  let startBox=new Box(new Vector(150,150),new Vector(100,100),"start",true,false,startData);
+  allBoxes.push(startBox);
+  initConsBox(startBox);
   // allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
   // allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
   // let template=new Slot(new Vector(0,0),new Vector(230,80),"choice");
@@ -841,8 +924,10 @@ function getOverCon(pos){
 
 function deleteSoftSelect(){
   if(softSelect){
-    killBox(softSelect);
-    softSelect=null;
+    if(softSelect.data==null||softSelect.data.editType!="start"){
+      killBox(softSelect);
+      softSelect=null;
+    }
   }
   updateControls();
 }
@@ -892,10 +977,6 @@ function keyPressed(event){
   }
   if(key=='d'||key=='D'){
     DDown=true;
-  }
-
-  if(key=='s'||key=='S'){//TEMP <<>>
-    console.log(exportJson());
   }
 
   if(key=='Tab'){
@@ -948,73 +1029,15 @@ function remove(arr,toRemove){
 }
 
 //---------------------------------------------
-class Scenario{
-  //ArrayList<> data
-  constructor(){
-    this.data=[];
-  }
+
+var storage = window.localStorage;
+function localSave(){
+  let toStore=new Scenario();
+  storage.setItem('scenario', JSON.stringify(exportScenerio(toStore)));
+  console.log(storage);
 }
 
-//USId = universal scenario Identifier
-class SceneSolo{
-  //String editType
-  //int USId
-
-  //String name
-  //String title
-  //String description
-  //media<<>>
-
-  //int nextScene (USId)
-  //Box source
-  constructor(){
-    this.editType="sceneSolo";
-    this.USId=null;
-    this.name="new scene";
-    this.title="title";
-    this.description="description";
-  }
-}
-class SceneQuestion{
-  //String editType
-  //int USId
-
-  //String name
-  //String title
-  //String description
-  //media<<>>
-
-  //ArrayList<Choice> choices
-  //Box source
-  constructor(){
-    this.editType="sceneQuestion";
-    this.USId=null;
-    this.name="new scene";
-    this.title="title";
-    this.description="description"; 
-  }
-
-}
-class Choice{
-  //String editType
-  //int USId
-
-  //String name
-  //String description 
-  //effects<<>>
-
-  //int nextScene (USId)<<>>
-  //Box source
-  constructor(){
-    this.editType="choice";
-    this.USId=null;
-    this.name="new choice";
-    this.description="description"; 
-  }
-}
-
-function exportJson(){
-  let scenario=new Scenario();
+function exportScenerio(scenario){
   let i;
   //assign ids
   for(i=0;i<allBoxes.length;i++){
@@ -1041,7 +1064,6 @@ function assignUSId(){
   currentUSId++;
   return currentUSId;
 }
-
 
 var controls=document.getElementById("controls");
 
