@@ -1,19 +1,4 @@
-class Scenario{
 
-}
-class SceneSolo{
-  //int USID //universal scenario Identifier
-}
-class SceneQuestion{
-  //int USID //universal scenario Identifier
-
-}
-class Choice{
-  //int USID //universal scenario Identifier
-
-}
-
-//---------------------------------------------
 class Vector {
   constructor(xOrVec,y,angleInit) {
     if(arguments.length == 1) {
@@ -231,7 +216,9 @@ class Box{
   //boolean hasOut;
   //boolean hasIn;
 
-  constructor(p, s, t, hO, hI){
+  //data
+
+  constructor(p, s, t, hO, hI,d){
     this.slots=[];
     this.pos=new Vector(p);
     this.size=new Vector(s);
@@ -243,6 +230,7 @@ class Box{
     }else{
       this.con=null;
     }
+    this.data=d;
   }
 
   kill(){
@@ -395,7 +383,7 @@ class Box{
       drawLine(tri1.x,tri1.y,tri3.x,tri3.y);
     }
     fill("#000000");
-    drawText(this.type,this.pos.x+this.size.x/2,this.pos.y+20);
+    drawText(this.data.name||this.type,this.pos.x+this.size.x/2,this.pos.y+20);
   }
 }
 
@@ -405,8 +393,8 @@ class InfiniteBox extends Box{
   //Box dropped;
   //int droppedIndex;
 
-  constructor(p, s, t, hO, hI, ts, tg){
-    super(p,s,t,hO,hI);
+  constructor(p, s, t, hO, hI, ts, tg,d){
+    super(p,s,t,hO,hI,d);
     this.templateSlot=ts;
     this.topGap=tg;
     this.update();
@@ -638,17 +626,21 @@ function draw(){
 }
 
 function newScene(){
+  let data=new SceneSolo();
+
   let spawnPos=getScreenCenter();
   let size=new Vector(250,100);
   let half=new Vector(size);
   half.sclVec(0.5);
   spawnPos.subVec(half);
 
-  let addBox=new Box(spawnPos,size,"scene",true,true);
+  let addBox=new Box(spawnPos,size,"scene",true,true,data);
   allBoxes.push(addBox);
   initConsBox(addBox);
 }
 function newQuestion(){
+  let data=new SceneQuestion();
+
   let spawnPos=getScreenCenter();
   let topGap=50;
   let slotSize=new Vector(230,80);
@@ -660,19 +652,21 @@ function newQuestion(){
   spawnPos.subVec(half);
 
   let template=new Slot(new Vector(0,0),slotSize,"choice");
-  let addBox=new InfiniteBox(spawnPos,new Vector(0,0),"scene",false,true,template,topGap);
+  let addBox=new InfiniteBox(spawnPos,new Vector(0,0),"scene",false,true,template,topGap,data);
   allBoxes.push(addBox);
   initConsBox(addBox);
 
 }
 function newChoice(){
+  let data=new Choice();
+
   let spawnPos=getScreenCenter();
   let size=new Vector(230,80);
   let half=new Vector(size);
   half.sclVec(0.5);
   spawnPos.subVec(half);
 
-  let addBox=new Box(spawnPos,size,"choice",true,false);
+  let addBox=new Box(spawnPos,size,"choice",true,false,data);
   allBoxes.push(addBox);
   initConsBox(addBox);
 }
@@ -736,6 +730,7 @@ function getMouse(){
   return new Vector((realMouse.x-cam.x)/zoom,(realMouse.y-cam.y)/zoom);
 }
 function mouseDown(pos){
+  forcePushControls();
   softSelect=null;
   selectedCon=getOverCon(pos);
   if(selectedCon!=null){
@@ -750,6 +745,7 @@ function mouseDown(pos){
       remove(allBoxes,selected);
     }
   }
+  updateControls();
 }
 function mouseUp(pos){
   if(selectedCon!=null){
@@ -808,6 +804,7 @@ function deleteSoftSelect(){
     killBox(softSelect);
     softSelect=null;
   }
+  updateControls();
 }
 function killBox(toKill){
   let i;
@@ -903,5 +900,147 @@ function remove(arr,toRemove){
     if ( arr[i] === toRemove) {
       arr.splice(i, 1);
     }
+  }
+}
+
+//---------------------------------------------
+class Scenario{
+
+}
+
+//USId = universal scenario Identifier
+class SceneSolo{
+  //String editType
+  //int USId
+
+  //String name
+  //String title
+  //String description
+  //media<<>>
+
+  //int nextScene (USId)<<>>
+  constructor(){
+    this.editType="sceneSolo";
+    this.USId=null;
+    this.name="new scene";
+    this.title="title";
+    this.description="description";
+  }
+}
+class SceneQuestion{
+  //String editType
+  //int USId
+
+  //String name
+  //String title
+  //String description
+  //media<<>>
+
+  //ArrayList<Choice> choices
+  constructor(){
+    this.editType="sceneQuestion";
+    this.USId=null;
+    this.name="new scene";
+    this.title="title";
+    this.description="description"; 
+  }
+
+}
+class Choice{
+  //String editType
+  //int USId
+
+  //String name
+  //String description 
+  //effects<<>>
+
+  //int nextScene (USId)<<>>
+  constructor(){
+    this.editType="choice";
+    this.USId=null;
+    this.name="new choice";
+    this.description="description"; 
+  }
+}
+
+var controls=document.getElementById("controls");
+
+function forcePushControls(){
+  let nodes=controls.childNodes;
+  let i;
+  for(i=0;i<nodes.length;i++){
+    if(nodes[i].push){
+      nodes[i].push();
+    }
+  }
+}
+function updateControls(){
+  while (controls.lastElementChild) {
+    controls.removeChild(controls.lastElementChild);
+  }
+
+  if(softSelect!=null){
+    let data=softSelect.data;
+    if(data.editType=="choice"){
+      let nameInput=document.createElement("INPUT");
+      nameInput.setAttribute("type", "text");
+      nameInput.setAttribute("value", data.name);
+      nameInput.push = ()=>{data.name=nameInput.value};
+      nameInput.onchange = ()=>{nameInput.push()};
+
+      let descInput=document.createElement("INPUT");
+      descInput.setAttribute("type", "text");
+      descInput.setAttribute("value", data.description);
+      descInput.push = ()=>{data.description=descInput.value};
+      descInput.onchange = ()=>{descInput.push()};
+
+      controls.appendChild(nameInput);
+      controls.appendChild(descInput);
+    }else if(data.editType=="sceneSolo"){
+      let nameInput=document.createElement("INPUT");
+      nameInput.setAttribute("type", "text");
+      nameInput.setAttribute("value", data.name);
+      nameInput.push = ()=>{data.name=nameInput.value};
+      nameInput.onchange = ()=>{nameInput.push()};
+
+      let titleInput=document.createElement("INPUT");
+      titleInput.setAttribute("type", "text");
+      titleInput.setAttribute("value", data.title);
+      titleInput.push = ()=>{data.title=titleInput.value};
+      titleInput.onchange = ()=>{titleInput.push()};
+
+      let descInput=document.createElement("INPUT");
+      descInput.setAttribute("type", "text");
+      descInput.setAttribute("value", data.description);
+      descInput.push = ()=>{data.description=descInput.value};
+      descInput.onchange = ()=>{descInput.push()};
+
+      controls.appendChild(nameInput);
+      controls.appendChild(titleInput);
+      controls.appendChild(descInput);
+    }else if(data.editType=="sceneQuestion"){
+      let nameInput=document.createElement("INPUT");
+      nameInput.setAttribute("type", "text");
+      nameInput.setAttribute("value", data.name);
+      nameInput.push = ()=>{data.name=nameInput.value};
+      nameInput.onchange = ()=>{nameInput.push()};
+
+      let titleInput=document.createElement("INPUT");
+      titleInput.setAttribute("type", "text");
+      titleInput.setAttribute("value", data.title);
+      titleInput.push = ()=>{data.title=titleInput.value};
+      titleInput.onchange = ()=>{titleInput.push()};
+
+      let descInput=document.createElement("INPUT");
+      descInput.setAttribute("type", "text");
+      descInput.setAttribute("value", data.description);
+      descInput.push = ()=>{data.description=descInput.value};
+      descInput.onchange = ()=>{descInput.push()};
+
+      controls.appendChild(nameInput);
+      controls.appendChild(titleInput);
+      controls.appendChild(descInput);
+    }
+
   }
 }
