@@ -155,6 +155,15 @@ class Connection{
     this.end=null;
     this.endPos=null;
   }
+  applyUSId(){
+    if(this.start!=null&&this.end!=null){
+      let startData=this.start.data;
+      let endData=this.end.data;
+      if(startData!=null&&endData!=null){
+        startData.nextUSId=endData.USId;
+      }
+    }
+  }
   reset(){
     this.end=null;
     this.endPos=null;
@@ -231,6 +240,23 @@ class Box{
       this.con=null;
     }
     this.data=d;
+  }
+
+  setUSId(){
+    if(this.data!=null){
+      this.data.USId=assignUSId();
+    }
+
+    let i;
+    for(i=0;i<this.slots.length;i++){
+      let held=this.slots[i].getHeld();
+      if(held!=null){
+        held.setUSId();
+      }
+    }
+  }
+  getSaveData(){
+    return this.data;
   }
 
   kill(){
@@ -401,6 +427,20 @@ class InfiniteBox extends Box{
     
     this.dropped=null;
     this.droppedIndex=-1;
+  }
+
+  //@Override
+  getSaveData(){
+    let childData=[];
+    let i;
+    for(i=0;i<this.slots.length;i++){
+      let child=this.slots[i].getHeld();
+      if(child!=null&&child.data!=null){
+        childData.push(child.data);
+      }
+    }
+    this.data.choices=childData;
+    return this.data;
   }
 
   //@Override
@@ -854,6 +894,10 @@ function keyPressed(event){
     DDown=true;
   }
 
+  if(key=='s'||key=='S'){//TEMP <<>>
+    console.log(exportJson());
+  }
+
   if(key=='Tab'){
     enableControls=false;
   }
@@ -905,7 +949,10 @@ function remove(arr,toRemove){
 
 //---------------------------------------------
 class Scenario{
-
+  //ArrayList<> data
+  constructor(){
+    this.data=[];
+  }
 }
 
 //USId = universal scenario Identifier
@@ -918,7 +965,8 @@ class SceneSolo{
   //String description
   //media<<>>
 
-  //int nextScene (USId)<<>>
+  //int nextScene (USId)
+  //Box source
   constructor(){
     this.editType="sceneSolo";
     this.USId=null;
@@ -937,6 +985,7 @@ class SceneQuestion{
   //media<<>>
 
   //ArrayList<Choice> choices
+  //Box source
   constructor(){
     this.editType="sceneQuestion";
     this.USId=null;
@@ -955,6 +1004,7 @@ class Choice{
   //effects<<>>
 
   //int nextScene (USId)<<>>
+  //Box source
   constructor(){
     this.editType="choice";
     this.USId=null;
@@ -962,6 +1012,36 @@ class Choice{
     this.description="description"; 
   }
 }
+
+function exportJson(){
+  let scenario=new Scenario();
+  let i;
+  //assign ids
+  for(i=0;i<allBoxes.length;i++){
+    allBoxes[i].setUSId();
+  }
+  //set connections
+  for(i=0;i<allCons.length;i++){
+    allCons[i].applyUSId();
+  }
+  let allData=[];
+  //get all data
+  for(i=0;i<allBoxes.length;i++){
+    let data=allBoxes[i].getSaveData();
+    if(data!=null){
+      allData.push(data);
+    }
+  }
+  scenario.data=allData;
+  return scenario;
+}
+
+var currentUSId=0;
+function assignUSId(){
+  currentUSId++;
+  return currentUSId;
+}
+
 
 var controls=document.getElementById("controls");
 
