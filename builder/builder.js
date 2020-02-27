@@ -1,9 +1,36 @@
 
 class Scenario{
-  //int scenarioId
+  //String name
+
   //ArrayList<> data
+  //ArrayList<> statuses
   constructor(){
     this.data=[];
+    this.statuses=[];
+  }
+}
+class Status{
+  //int USId
+  //float value
+
+  //String name
+  //String displayType
+  //float startVal
+  //float max
+  //float min
+  constructor(){
+    this.name="new status";
+    this.startVal=0;
+    this.max=null;
+    this.min=null;
+  }
+}
+class Effect{
+  //Status status
+  //float effect
+  constructor(){
+    this.status=null;
+    this.effect=0;
   }
 }
 
@@ -66,7 +93,7 @@ class Choice{
 
   //String name
   //String description 
-  //effects<<>>
+  //ArrayList<Effect> effects
 
   //int nextScene (USId)
   constructor(){
@@ -74,6 +101,7 @@ class Choice{
     this.USId=null;
     this.name="new choice";
     this.description="description"; 
+    this.effects=[];
   }
 }
 class Vector {
@@ -665,10 +693,17 @@ var strokeVar;
 var fillVar;
 var framerate=1000/60;
 
+var allStatuses=[];
+
 var canvas=document.getElementById("canvas");
 var ctx=canvas.getContext("2d");
 
 var realMouse=new Vector(0,0);
+
+var controls=document.getElementById("controls");
+var storage = window.localStorage;
+var currentUSId=0;
+
 setup();
 draw();
 setInterval(()=>{draw()},framerate);
@@ -687,10 +722,11 @@ function setup(){
   //size(800,800);
 
   let startData=new Start();
-  console.log(startData)
+  console.log(startData);
   let startBox=new Box(new Vector(150,150),new Vector(100,100),"start",true,false,startData);
   allBoxes.push(startBox);
   initConsBox(startBox);
+  updateControls();
   // allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
   // allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
   // let template=new Slot(new Vector(0,0),new Vector(230,80),"choice");
@@ -853,7 +889,7 @@ function getMouse(){
   return new Vector((realMouse.x-cam.x)/zoom,(realMouse.y-cam.y)/zoom);
 }
 function mouseDown(pos){
-  forcePushControls();
+  forcePushControls(controls);
   softSelect=null;
   selectedCon=getOverCon(pos);
   if(selectedCon!=null){
@@ -1029,8 +1065,6 @@ function remove(arr,toRemove){
 }
 
 //---------------------------------------------
-
-var storage = window.localStorage;
 function localSave(){
   let toStore=new Scenario();
   storage.setItem('scenario', JSON.stringify(exportScenerio(toStore)));
@@ -1039,6 +1073,10 @@ function localSave(){
 
 function exportScenerio(scenario){
   let i;
+  //assign ids to Statuses
+  for(i=0;i<allStatuses.length;i++){
+    allStatuses[i].USId=assignUSId();
+  }
   //assign ids
   for(i=0;i<allBoxes.length;i++){
     allBoxes[i].setUSId();
@@ -1056,26 +1094,26 @@ function exportScenerio(scenario){
     }
   }
   scenario.data=allData;
+  scenario.statuses=allStatuses;
   return scenario;
 }
 
-var currentUSId=0;
 function assignUSId(){
   currentUSId++;
   return currentUSId;
 }
 
-var controls=document.getElementById("controls");
-
-function forcePushControls(){
-  let nodes=controls.childNodes;
+function forcePushControls(target){
+  let nodes=target.childNodes;
   let i;
   for(i=0;i<nodes.length;i++){
     if(nodes[i].push){
       nodes[i].push();
     }
+    forcePushControls(nodes[i]);
   }
 }
+
 function updateControls(){
   while (controls.lastElementChild) {
     controls.removeChild(controls.lastElementChild);
@@ -1084,6 +1122,7 @@ function updateControls(){
   if(softSelect!=null){
     let data=softSelect.data;
     if(data.editType=="choice"){
+      //add basic choice options
       let nameInput=document.createElement("INPUT");
       nameInput.setAttribute("type", "text");
       nameInput.setAttribute("value", data.name);
@@ -1098,6 +1137,58 @@ function updateControls(){
 
       controls.appendChild(nameInput);
       controls.appendChild(descInput);
+
+      let effectListDiv=document.createElement("DIV");
+      //list of effects
+      let effectList=data.effects;
+      let i;
+      for(i=0;i<effectList.length;i++){
+        let effectItem=effectList[i];
+
+        let effectDiv=document.createElement("DIV");
+
+        //create dropdown
+        let selector=document.createElement("SELECT");
+        let noOption=document.createElement("OPTION");
+        noOption.innerHTML="none";
+        noOption.data=null;
+
+        selector.appendChild(noOption);
+        let j;
+        for(j=0;j<allStatuses.length;j++){
+          let option=document.createElement("OPTION");
+          option.innerHTML=allStatuses[j].name;
+          option.data=allStatuses[j];
+          if(allStatuses[j]==effectItem.status){
+            option.setAttribute("selected", "selected");
+          }
+          selector.appendChild(option);
+        }
+        selector.onchange=()=>{effectItem.status=selector.options[selector.selectedIndex].data};
+
+
+        let valInput=document.createElement("INPUT");
+        valInput.setAttribute("type", "number");
+        valInput.setAttribute("value", effectItem.effect);
+        valInput.push = ()=>{effectItem.effect=valInput.value};
+        valInput.onchange = ()=>{valInput.push()};
+
+        let remBtn=document.createElement("BUTTON");
+        remBtn.innerHTML="remove";
+        remBtn.onclick=()=>{remove(effectList,effectItem); updateControls();};
+
+        effectDiv.appendChild(selector);
+        effectDiv.appendChild(valInput);
+        effectDiv.appendChild(remBtn);
+        effectListDiv.appendChild(effectDiv);
+      }
+      let newEffBtn=document.createElement("BUTTON");
+      newEffBtn.classList.add("newEffect");
+      newEffBtn.innerHTML="add new effect";
+      newEffBtn.onclick=()=>{effectList.push(new Effect()); updateControls();};
+
+      effectListDiv.appendChild(newEffBtn);
+      controls.appendChild(effectListDiv);
     }else if(data.editType=="sceneSolo"){
       let nameInput=document.createElement("INPUT");
       nameInput.setAttribute("type", "text");
@@ -1144,5 +1235,47 @@ function updateControls(){
       controls.appendChild(descInput);
     }
 
+  }else{
+    //Scenario and Status editor
+    let i;
+    for(i=0;i<allStatuses.length;i++){
+      let data=allStatuses[i];
+
+      let statusDiv=document.createElement("DIV");
+
+      let nameInput=document.createElement("INPUT");
+      nameInput.setAttribute("type", "text");
+      nameInput.setAttribute("value", data.name);
+      nameInput.push = ()=>{data.name=nameInput.value};
+      nameInput.onchange = ()=>{nameInput.push()};
+
+      let valInput=document.createElement("INPUT");
+      valInput.setAttribute("type", "number");
+      valInput.setAttribute("value", data.startVal);
+      valInput.push = ()=>{data.startVal=valInput.value};
+      valInput.onchange = ()=>{valInput.push()};
+
+      let remBtn=document.createElement("BUTTON");
+      remBtn.innerHTML="remove";
+      remBtn.onclick=()=>{deleteStatus(data); updateControls();};
+
+      statusDiv.appendChild(nameInput);
+      statusDiv.appendChild(valInput);
+      statusDiv.appendChild(remBtn);
+      controls.appendChild(statusDiv);
+    }
+    let newStatBtn=document.createElement("BUTTON");
+    newStatBtn.classList.add("newStatus");
+    newStatBtn.innerHTML="add new status";
+    newStatBtn.onclick=()=>{newStatus(); updateControls();};
+
+    controls.appendChild(newStatBtn);
   }
+}
+
+function newStatus(){
+  allStatuses.push(new Status());
+}
+function deleteStatus(toRemove){
+  remove(allStatuses,toRemove);
 }
