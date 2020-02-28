@@ -1,10 +1,13 @@
 
+const serverUrl="http://localhost:3000/";
+
 class Scenario{
   //String name
 
   //ArrayList<> data
   //ArrayList<> statuses
   constructor(){
+    this.name="new scenario";
     this.data=[];
     this.statuses=[];
   }
@@ -703,6 +706,7 @@ var realMouse=new Vector(0,0);
 var controls=document.getElementById("controls");
 var storage = window.localStorage;
 var currentUSId=0;
+var loadedScenario=null;
 
 setup();
 draw();
@@ -720,6 +724,8 @@ function setup(){
   noStroke();
   noFill();
   //size(800,800);
+
+  serverLoad();
 
   let startData=new Start();
   console.log(startData);
@@ -782,6 +788,23 @@ function draw(){
   //to display mouse:
   //fill("#00A0A0");
   //drawRect(getMouse().x,getMouse().y,10,10);
+}
+
+function serverLoad(){
+  let scnId =  localStorage.getItem('targetScenario');
+  if(scnId!=null){
+
+    //get data from server
+    var xhr = new XMLHttpRequest();
+    xhr.open("get", serverUrl+"scenario"+"?id="+scnId, false);
+    xhr.send( null );
+    let data=JSON.parse(xhr.responseText);
+
+    loadedScenario = data;
+  }
+  if(loadedScenario==null){
+    loadedScenario=new Scenario();
+  }
 }
 
 function newScene(){
@@ -1066,11 +1089,34 @@ function remove(arr,toRemove){
 
 //---------------------------------------------
 function localSave(){
-  let toStore=new Scenario();
+  let toStore=loadedScenario;
   storage.setItem('scenario', JSON.stringify(exportScenerio(toStore)));
   console.log(storage);
 }
+function serverSave(){
+  resetExport();
+  let toStore=loadedScenario;
+  toStore=exportScenerio(toStore);
 
+  var xhr = new XMLHttpRequest();
+  xhr.open("POST", serverUrl+"scenario", false);
+  xhr.setRequestHeader('Content-Type', 'application/json');
+  xhr.send(JSON.stringify(toStore));
+
+  if(!loadedScenario.scenarioId){
+    var xhr2 = new XMLHttpRequest();
+    xhr2.open("get", serverUrl+"scenario/newid", false);
+    xhr2.send( null );
+    let newScnId=xhr2.responseText;
+
+    console.log(newScnId);
+    loadedScenario.scenarioId=newScnId;
+  }
+}
+
+function resetExport(){
+  currentUSId=0;
+}
 function exportScenerio(scenario){
   let i;
   //assign ids to Statuses

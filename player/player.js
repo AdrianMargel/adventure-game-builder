@@ -1,5 +1,8 @@
 
+const serverUrl="http://localhost:3000/";
+const siteUrl="http://127.0.0.1:5500/";
 var storage = window.localStorage;
+
 var loadedScenario=null;
 var currentScene=null;
 var player=document.getElementById("player");
@@ -8,7 +11,7 @@ var statuses=document.getElementById("statuses");
 init();
 
 function init(){
-  localLoad();
+  serverLoad();
   initStatuses();
   let start=getStart();
   setScene(start.nextUSId);
@@ -18,6 +21,19 @@ function localLoad(){
   console.log(storage);
   loadedScenario =  JSON.parse(localStorage.getItem('scenario'));
   console.log(loadedScenario);
+}
+function serverLoad(){
+  let scnId =  localStorage.getItem('targetScenario');
+
+  //get data from server
+  var xhr = new XMLHttpRequest();
+  xhr.open("get", serverUrl+"scenario"+"?id="+scnId, false);
+  xhr.send( null );
+  let data=JSON.parse(xhr.responseText);
+  console.log(data);
+
+  loadedScenario = data;
+  
 }
 function initStatuses(){
   let i;
@@ -119,6 +135,7 @@ function loadScene(){
 }
 function end(){
   console.log("end");
+  window.location.href = siteUrl+"/player/ending.html";
 }
 
 function applyEffects(toApply){
