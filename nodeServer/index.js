@@ -44,7 +44,10 @@ app.post('/scenario', function(req, res) {
 	//TODO validation <<>>
 	if(toAdd.scenarioId){
 		console.log("has id",toAdd);
-		//<<>>
+		let index=getScenarioIndex(toAdd.scenarioId);
+		if(index!=-1){
+			allScenarios[index]=toAdd;
+		}
 	}else{
 		console.log("no id",toAdd);
 		let newId=assignScenarioId();
@@ -85,6 +88,17 @@ function getScenario(id){//improve with binary search?<<>>
 		}
 	}
 	return null;
+}
+function getScenarioIndex(id){//improve?<<>>
+	if(id!=null){
+		let i;
+		for(i=0;i<allScenarios.length;i++){
+			if(allScenarios[i].scenarioId==id){
+				return i;
+			}
+		}
+	}
+	return -1;
 }
 //create/update scenario
 app.post('/scenario/delete', function(req, res) {
