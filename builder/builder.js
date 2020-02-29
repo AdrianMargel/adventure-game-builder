@@ -762,6 +762,7 @@ var ctx=canvas.getContext("2d");
 var realMouse=new Vector(0,0);
 
 var controls=document.getElementById("controls");
+var scenarioOptions=document.getElementById("scenarioOptions");
 var storage = window.localStorage;
 var currentUSId=0;
 var loadedScenario=null;
@@ -1265,9 +1266,14 @@ function forcePushControls(target){
   }
 }
 
+var effectControls;
 function updateControls(){
+  effectControls=[];
   while (controls.lastElementChild) {
     controls.removeChild(controls.lastElementChild);
+  }
+  while (scenarioOptions.lastElementChild) {
+    scenarioOptions.removeChild(scenarioOptions.lastElementChild);
   }
 
   if(softSelect!=null){
@@ -1313,6 +1319,7 @@ function updateControls(){
           if(allStatuses[j]==effectItem.status){
             option.setAttribute("selected", "selected");
           }
+          effectControls.push(option);
           selector.appendChild(option);
         }
         selector.onchange=()=>{effectItem.status=selector.options[selector.selectedIndex].data};
@@ -1386,41 +1393,47 @@ function updateControls(){
       controls.appendChild(descInput);
     }
 
-  }else{
-    //Scenario and Status editor
-    let i;
-    for(i=0;i<allStatuses.length;i++){
-      let data=allStatuses[i];
+  }
 
-      let statusDiv=document.createElement("DIV");
+  //Scenario and Status editor
+  let i;
+  for(i=0;i<allStatuses.length;i++){
+    let data=allStatuses[i];
 
-      let nameInput=document.createElement("INPUT");
-      nameInput.setAttribute("type", "text");
-      nameInput.setAttribute("value", data.name);
-      nameInput.push = ()=>{data.name=nameInput.value};
-      nameInput.onchange = ()=>{nameInput.push()};
+    let statusDiv=document.createElement("DIV");
 
-      let valInput=document.createElement("INPUT");
-      valInput.setAttribute("type", "number");
-      valInput.setAttribute("value", data.startVal);
-      valInput.push = ()=>{data.startVal=valInput.value};
-      valInput.onchange = ()=>{valInput.push()};
+    let nameInput=document.createElement("INPUT");
+    nameInput.setAttribute("type", "text");
+    nameInput.setAttribute("value", data.name);
+    nameInput.push = ()=>{data.name=nameInput.value};
+    nameInput.onchange = ()=>{nameInput.push(); updateStatusControls();};
 
-      let remBtn=document.createElement("BUTTON");
-      remBtn.innerHTML="remove";
-      remBtn.onclick=()=>{deleteStatus(data); updateControls();};
+    let valInput=document.createElement("INPUT");
+    valInput.setAttribute("type", "number");
+    valInput.setAttribute("value", data.startVal);
+    valInput.push = ()=>{data.startVal=valInput.value};
+    valInput.onchange = ()=>{valInput.push()};
 
-      statusDiv.appendChild(nameInput);
-      statusDiv.appendChild(valInput);
-      statusDiv.appendChild(remBtn);
-      controls.appendChild(statusDiv);
-    }
-    let newStatBtn=document.createElement("BUTTON");
-    newStatBtn.classList.add("newStatus");
-    newStatBtn.innerHTML="add new status";
-    newStatBtn.onclick=()=>{newStatus(); updateControls();};
+    let remBtn=document.createElement("BUTTON");
+    remBtn.innerHTML="remove";
+    remBtn.onclick=()=>{deleteStatus(data); updateControls();};
 
-    controls.appendChild(newStatBtn);
+    statusDiv.appendChild(nameInput);
+    statusDiv.appendChild(valInput);
+    statusDiv.appendChild(remBtn);
+    scenarioOptions.appendChild(statusDiv);
+  }
+  let newStatBtn=document.createElement("BUTTON");
+  newStatBtn.classList.add("newStatus");
+  newStatBtn.innerHTML="add new status";
+  newStatBtn.onclick=()=>{newStatus(); updateControls();};
+
+  scenarioOptions.appendChild(newStatBtn);
+}
+function updateStatusControls(){
+  let i=0;
+  for(i=0;i<effectControls.length;i++){
+    effectControls[i].innerHTML=effectControls[i].data.name;
   }
 }
 
