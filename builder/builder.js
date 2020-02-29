@@ -1396,6 +1396,16 @@ function updateControls(){
   }
 
   //Scenario and Status editor
+
+  let sNameInput=document.createElement("INPUT");
+  sNameInput.setAttribute("type", "text");
+  sNameInput.setAttribute("value", loadedScenario.name);
+  sNameInput.push = ()=>{loadedScenario.name=sNameInput.value};
+  sNameInput.onchange = ()=>{sNameInput.push()};
+  scenarioOptions.appendChild(sNameInput);
+
+  let statusListDiv=document.createElement("DIV");
+
   let i;
   for(i=0;i<allStatuses.length;i++){
     let data=allStatuses[i];
@@ -1421,14 +1431,15 @@ function updateControls(){
     statusDiv.appendChild(nameInput);
     statusDiv.appendChild(valInput);
     statusDiv.appendChild(remBtn);
-    scenarioOptions.appendChild(statusDiv);
+    statusListDiv.appendChild(statusDiv);
   }
   let newStatBtn=document.createElement("BUTTON");
   newStatBtn.classList.add("newStatus");
   newStatBtn.innerHTML="add new status";
   newStatBtn.onclick=()=>{newStatus(); updateControls();};
 
-  scenarioOptions.appendChild(newStatBtn);
+  statusListDiv.appendChild(newStatBtn);
+  scenarioOptions.appendChild(statusListDiv);
 }
 function updateStatusControls(){
   let i=0;
