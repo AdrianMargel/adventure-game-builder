@@ -1277,26 +1277,40 @@ function updateControls(){
     scenarioOptions.removeChild(scenarioOptions.lastElementChild);
   }
 
+  let cTitle=document.createElement("P");
+  cTitle.classList.add("title");
+  controls.appendChild(cTitle);
+
   if(softSelect!=null){
     let data=softSelect.data;
     if(data.editType=="choice"){
+      cTitle.innerHTML="Choice";
       //add basic choice options
+      let nameLabel=document.createElement("P");
+      nameLabel.innerHTML="name:";
       let nameInput=document.createElement("INPUT");
       nameInput.setAttribute("type", "text");
       nameInput.setAttribute("value", data.name);
       nameInput.push = ()=>{data.name=nameInput.value};
       nameInput.onchange = ()=>{nameInput.push()};
 
+      let descLabel=document.createElement("P");
+      descLabel.innerHTML="description:";
       let descInput=document.createElement("INPUT");
       descInput.setAttribute("type", "text");
       descInput.setAttribute("value", data.description);
       descInput.push = ()=>{data.description=descInput.value};
       descInput.onchange = ()=>{descInput.push()};
 
+      controls.appendChild(nameLabel);
       controls.appendChild(nameInput);
+      controls.appendChild(descLabel);
       controls.appendChild(descInput);
 
       let effectListDiv=document.createElement("DIV");
+      let effectsLabel=document.createElement("P");
+      effectsLabel.innerHTML="effects:";
+      effectListDiv.appendChild(effectsLabel);
       //list of effects
       let effectList=data.effects;
       let i;
@@ -1349,63 +1363,102 @@ function updateControls(){
       effectListDiv.appendChild(newEffBtn);
       controls.appendChild(effectListDiv);
     }else if(data.editType=="sceneSolo"){
+      cTitle.innerHTML="Scene";
+
+      let nameLabel=document.createElement("P");
+      nameLabel.innerHTML="name:";
       let nameInput=document.createElement("INPUT");
       nameInput.setAttribute("type", "text");
       nameInput.setAttribute("value", data.name);
       nameInput.push = ()=>{data.name=nameInput.value};
       nameInput.onchange = ()=>{nameInput.push()};
 
+      let titleLabel=document.createElement("P");
+      titleLabel.innerHTML="title:";
       let titleInput=document.createElement("INPUT");
       titleInput.setAttribute("type", "text");
       titleInput.setAttribute("value", data.title);
       titleInput.push = ()=>{data.title=titleInput.value};
       titleInput.onchange = ()=>{titleInput.push()};
 
+      let descLabel=document.createElement("P");
+      descLabel.innerHTML="description:";
       let descInput=document.createElement("INPUT");
       descInput.setAttribute("type", "text");
       descInput.setAttribute("value", data.description);
       descInput.push = ()=>{data.description=descInput.value};
       descInput.onchange = ()=>{descInput.push()};
 
+      controls.appendChild(nameLabel);
       controls.appendChild(nameInput);
+      controls.appendChild(titleLabel);
       controls.appendChild(titleInput);
+      controls.appendChild(descLabel);
       controls.appendChild(descInput);
     }else if(data.editType=="sceneQuestion"){
+      cTitle.innerHTML="Scene";
+      let nameLabel=document.createElement("P");
+      nameLabel.innerHTML="name:";
       let nameInput=document.createElement("INPUT");
       nameInput.setAttribute("type", "text");
       nameInput.setAttribute("value", data.name);
       nameInput.push = ()=>{data.name=nameInput.value};
       nameInput.onchange = ()=>{nameInput.push()};
 
+      let titleLabel=document.createElement("P");
+      titleLabel.innerHTML="title:";
       let titleInput=document.createElement("INPUT");
       titleInput.setAttribute("type", "text");
       titleInput.setAttribute("value", data.title);
       titleInput.push = ()=>{data.title=titleInput.value};
       titleInput.onchange = ()=>{titleInput.push()};
 
+      let descLabel=document.createElement("P");
+      descLabel.innerHTML="description:";
       let descInput=document.createElement("INPUT");
       descInput.setAttribute("type", "text");
       descInput.setAttribute("value", data.description);
       descInput.push = ()=>{data.description=descInput.value};
       descInput.onchange = ()=>{descInput.push()};
 
+      controls.appendChild(nameLabel);
       controls.appendChild(nameInput);
+      controls.appendChild(titleLabel);
       controls.appendChild(titleInput);
+      controls.appendChild(descLabel);
       controls.appendChild(descInput);
     }
 
+  }else{
+    cTitle.innerHTML="Scene";
+
+    let info=document.createElement("P");
+    info.classList.add("info");
+    info.innerHTML="(select a scene to edit it)";
+    controls.appendChild(info);
   }
 
   //Scenario and Status editor
 
+  let sTitle=document.createElement("P");
+  sTitle.classList.add("title");
+  sTitle.innerHTML="Scenario";
+
+  let sNameLabel=document.createElement("P");
+  sNameLabel.innerHTML="scenario name:";
   let sNameInput=document.createElement("INPUT");
   sNameInput.setAttribute("type", "text");
   sNameInput.setAttribute("value", loadedScenario.name);
   sNameInput.push = ()=>{loadedScenario.name=sNameInput.value};
   sNameInput.onchange = ()=>{sNameInput.push()};
+  scenarioOptions.appendChild(sTitle);
+  scenarioOptions.appendChild(sNameLabel);
   scenarioOptions.appendChild(sNameInput);
 
   let statusListDiv=document.createElement("DIV");
+  let statusLabel=document.createElement("P");
+  statusLabel.innerHTML="statuses:";
+  statusListDiv.appendChild(statusLabel);
 
   let i;
   for(i=0;i<allStatuses.length;i++){
