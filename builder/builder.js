@@ -1216,6 +1216,7 @@ function serverSave(){
 
     console.log(newScnId);
     loadedScenario.scenarioId=newScnId;
+    storage.setItem('targetScenario', newScnId);
   }
 }
 
