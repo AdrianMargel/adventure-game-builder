@@ -348,6 +348,21 @@ class Box{
       this.con=null;
     }
     this.data=d;
+    if(this.data!=null){
+      if(this.data.pos){
+        this.pos=new Vector(this.data.pos.x,this.data.pos.y);
+      }
+
+      if(this.data.effects){
+        let i;
+        for(i=0;i<this.data.effects.length;i++){
+          if(this.data.effects[i].status){
+            let realStatus=getStatusByUSId(this.data.effects[i].status.USId);
+            this.data.effects[i].status=realStatus;
+          }
+        }
+      }
+    }
   }
 
   setUSId(){
@@ -364,6 +379,7 @@ class Box{
     }
   }
   getSaveData(){
+    this.data.pos=this.pos;
     return this.data;
   }
 
@@ -391,6 +407,22 @@ class Box{
       let temp=this.slots[i].getHeld();
       if(temp!=null){
         temp.addAllCons(addTo);
+      }
+    }
+  }
+  loadCons(addTo){
+    //console.log("t",this.data);
+    if(this.con!=null){
+      if(this.data&&this.data.nextUSId){
+        this.con.setEnd(getByUSId(this.data.nextUSId));
+      }
+      addTo.push(this.con);
+    }
+    let i;
+    for(i=0;i<this.slots.length;i++){
+      let temp=this.slots[i].getHeld();
+      if(temp!=null){
+        temp.loadCons(addTo);
       }
     }
   }
@@ -531,10 +563,35 @@ class InfiniteBox extends Box{
     super(p,s,t,hO,hI,d);
     this.templateSlot=ts;
     this.topGap=tg;
-    this.update();
     
     this.dropped=null;
     this.droppedIndex=-1;
+
+    //add choices from data if there are any
+    if(this.data.choices){
+      let slottedBoxes=[];
+      let i;
+      for(i=0;i<this.data.choices.length;i++){
+        let choiceData=this.data.choices[i];
+        slottedBoxes.push(new Box(new Vector(0,0),new Vector(230,80),"choice",true,false,choiceData));
+      }
+
+      this.slots=[];
+      let addY=this.templateSlot.size.y+marginY;
+      let addPos=new Vector(marginX,this.topGap);
+
+      for(i=0;i<slottedBoxes.length;i++){
+        let insertSlot=new Slot(this.templateSlot,addPos);
+        insertSlot.fillSlot(slottedBoxes[i]);
+        this.slots.push(insertSlot);
+        addPos.y+=addY;
+      }
+      let addSlot=new Slot(this.templateSlot,addPos);
+      this.slots.push(addSlot);
+      addPos.y+=addY;
+      this.size=new Vector(this.templateSlot.size.x+marginX*2,addPos.y-this.pos.y);
+    }
+    this.update();
   }
 
   //@Override
@@ -548,6 +605,7 @@ class InfiniteBox extends Box{
       }
     }
     this.data.choices=childData;
+    this.data.pos=this.pos;
     return this.data;
   }
 
@@ -725,13 +783,14 @@ function setup(){
   noFill();
   //size(800,800);
 
-  serverLoad();
-
-  let startData=new Start();
-  console.log(startData);
-  let startBox=new Box(new Vector(150,150),new Vector(100,100),"start",true,false,startData);
-  allBoxes.push(startBox);
-  initConsBox(startBox);
+  if(serverLoad()){
+    loadScenario();
+  }else{
+    let startData=new Start();
+    let startBox=new Box(new Vector(150,150),new Vector(100,100),"start",true,false,startData);
+    allBoxes.push(startBox);
+    initConsBox(startBox);
+  }
   updateControls();
   // allBoxes.push(new Box(new Vector(50,230),new Vector(250,100),"scene",true,true));
   // allBoxes.push(new Box(new Vector(50,10),new Vector(230,80),"choice",true,false));
@@ -792,7 +851,7 @@ function draw(){
 
 function serverLoad(){
   let scnId =  localStorage.getItem('targetScenario');
-  if(scnId!=null){
+  if(scnId!=-1){
 
     //get data from server
     var xhr = new XMLHttpRequest();
@@ -804,9 +863,54 @@ function serverLoad(){
   }
   if(loadedScenario==null){
     loadedScenario=new Scenario();
+    return false;
+  }
+  return true;
+}
+function loadScenario(){
+  console.log(loadedScenario);
+  allStatuses=loadedScenario.statuses;
+  let seedBoxes=loadedScenario.data;
+  let i;
+  //add all boxes
+  for(i=0;i<seedBoxes.length;i++){
+    let addBox;
+    let data=seedBoxes[i];
+    if(data.editType=="sceneSolo"){
+      addBox=new Box(new Vector(0,0),new Vector(250,100),"scene",true,true,data);
+    }else if(data.editType=="sceneQuestion"){
+      let topGap=50;
+      let slotSize=new Vector(230,80);
+      let template=new Slot(new Vector(0,0),slotSize,"choice");
+      addBox=new InfiniteBox(new Vector(0,0),new Vector(0,0),"scene",false,true,template,topGap,data);
+    }else if(data.editType=="choice"){
+      addBox=new Box(new Vector(0,0),new Vector(230,80),"choice",true,false,data);
+    }else if(data.editType=="start"){
+      addBox=new Box(new Vector(150,150),new Vector(100,100),"start",true,false,data);
+    }
+    allBoxes.push(addBox);
+  }
+  //connect all boxes
+  for(i=0;i<allBoxes.length;i++){
+    allBoxes[i].loadCons(allCons);
   }
 }
-
+function getByUSId(tarId){
+  for(i=0;i<allBoxes.length;i++){
+    if(allBoxes[i].data&&allBoxes[i].data.USId==tarId){
+      return allBoxes[i];
+    }
+  }
+  return null;
+}
+function getStatusByUSId(tarId){
+  for(i=0;i<allStatuses.length;i++){
+    if(allStatuses[i].USId==tarId){
+      return allStatuses[i];
+    }
+  }
+  return null;
+}
 function newScene(){
   let data=new SceneSolo();
 
@@ -1139,6 +1243,7 @@ function exportScenerio(scenario){
       allData.push(data);
     }
   }
+  //set data
   scenario.data=allData;
   scenario.statuses=allStatuses;
   return scenario;

@@ -60,6 +60,6 @@ function viewScenario(id){
   window.location.href = siteUrl+"/player/player.html";
 }
 function newScenario(){
-  storage.setItem('targetScenario', null);
+  storage.setItem('targetScenario', -1);
   window.location.href = siteUrl+"/builder/builder.html";
 }
