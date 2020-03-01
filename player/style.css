@@ -1,5 +1,32 @@
 body{
 	margin: 0;
+	font-family: 'Spartan', sans-serif;
+}
+p{
+	margin: 0;
+}
+button{
+	padding: 4px 8px;
+	border-radius: 2px;
+
+	background: white;
+	color: black;
+	border: 1px solid black;
+	font-family: 'Spartan', sans-serif;
+}
+button:active{
+	border: 1px solid #0CD37A;
+	color: #0CD37A;
+}
+button:focus {
+	outline:0;
+}	
+.contain{
+	max-width: 1024px;
+	margin-right: auto;
+	margin-left: auto;
+	padding-right: 10px;
+	padding-left: 10px;
 }
 .editTop{
 	padding-top: 10px;
@@ -11,4 +38,34 @@ body{
 	max-width: 1024px;
 	margin-right: auto;
 	margin-left: auto;
+}
+#statuses{
+	padding-top: 10px;
+	padding-bottom: 10px;
+}
+#player p{
+	text-align: center;
+}
+
+.title{
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin-bottom: 8px;
+}
+.description{
+	margin-bottom: 20px;
+
+}
+#player button{
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
+	padding: 5px 10px;
+	margin-bottom: 5px;
+	min-width: 400px;
+}
+@media only screen and (max-width: 420px) {
+	#player button{
+		min-width: 100%;
+	}
 }

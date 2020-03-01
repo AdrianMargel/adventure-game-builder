@@ -3,20 +3,24 @@
 <head>
 	<meta charset="utf-8">
 	<title></title>
+	<link href="https://fonts.googleapis.com/css?family=Montserrat|Spartan:400,600&display=swap" rel="stylesheet"> 
 
 	<link rel="stylesheet" href="style.css">
 </head>
 <body>
 	<div class="editTop">
-		<button onclick="newScene()">new Scene</button>
-		<button onclick="newQuestion()">new Question</button>
-		<button onclick="newChoice()">new Choice</button>
 		<!-- <button onclick="localSave()">Save</button> -->
-		<button onclick="serverSave()">Save</button>
+		<button onclick="serverSave()">save</button>
 		<a href="../player/player.html">view</a>
+		<a href="../scenarios/scenarios.html">exit</a>
 	</div>
 	<canvas id="canvas" width="800" height="800"></canvas>
 
+	<div class="editMenu">
+		<button onclick="newScene()">new Scene</button>
+		<button onclick="newQuestion()">new Question</button>
+		<button onclick="newChoice()">new Choice</button>
+	</div>
 	<div class="contain editPanel">
 		<div id="controls"></div>
 		<div id="scenarioOptions"></div>

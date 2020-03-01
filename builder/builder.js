@@ -522,11 +522,12 @@ class Box{
   
   display(){
     if(this===softSelect){
-      stroke("#00ff00");
+      stroke("#000000");
+      fill("#00E077");
     }else{
       stroke("#000000");
+      fill("#B0B0B0");
     }
-    fill("#B0B0B0");
     drawRect(this.pos.x,this.pos.y,this.size.x,this.size.y);
     let i;
     for(i=0;i<this.slots.length;i++){
@@ -960,7 +961,7 @@ function newChoice(){
 
 function resize(){
   canvas.width = document.getElementsByTagName("BODY")[0].offsetWidth;
-  canvas.height = Math.max(window.innerHeight-200,200);
+  canvas.height = Math.max(window.innerHeight-400,400);
 }
 function mousePressed(){
   let scrollY = window.scrollY
@@ -1018,6 +1019,7 @@ function getMouse(){
 }
 function mouseDown(pos){
   forcePushControls(controls);
+  forcePushControls(scenarioOptions);
   softSelect=null;
   selectedCon=getOverCon(pos);
   if(selectedCon!=null){
@@ -1309,6 +1311,7 @@ function updateControls(){
 
       let effectListDiv=document.createElement("DIV");
       let effectsLabel=document.createElement("P");
+      effectsLabel.classList.add("listTitle");
       effectsLabel.innerHTML="effects:";
       effectListDiv.appendChild(effectsLabel);
       //list of effects
@@ -1347,6 +1350,7 @@ function updateControls(){
         valInput.onchange = ()=>{valInput.push()};
 
         let remBtn=document.createElement("BUTTON");
+        remBtn.classList.add("bad");
         remBtn.innerHTML="remove";
         remBtn.onclick=()=>{remove(effectList,effectItem); updateControls();};
 
@@ -1356,7 +1360,7 @@ function updateControls(){
         effectListDiv.appendChild(effectDiv);
       }
       let newEffBtn=document.createElement("BUTTON");
-      newEffBtn.classList.add("newEffect");
+      newEffBtn.classList.add("good");
       newEffBtn.innerHTML="add new effect";
       newEffBtn.onclick=()=>{effectList.push(new Effect()); updateControls();};
 
@@ -1383,9 +1387,10 @@ function updateControls(){
 
       let descLabel=document.createElement("P");
       descLabel.innerHTML="description:";
-      let descInput=document.createElement("INPUT");
-      descInput.setAttribute("type", "text");
-      descInput.setAttribute("value", data.description);
+      let descInput=document.createElement("TEXTAREA");
+      //descInput.setAttribute("type", "text");
+      //descInput.setAttribute("value", data.description);
+      descInput.value=data.description;
       descInput.push = ()=>{data.description=descInput.value};
       descInput.onchange = ()=>{descInput.push()};
 
@@ -1415,9 +1420,10 @@ function updateControls(){
 
       let descLabel=document.createElement("P");
       descLabel.innerHTML="description:";
-      let descInput=document.createElement("INPUT");
-      descInput.setAttribute("type", "text");
-      descInput.setAttribute("value", data.description);
+      let descInput=document.createElement("TEXTAREA");
+      //descInput.setAttribute("type", "text");
+      //descInput.setAttribute("value", data.description);
+      descInput.value=data.description;
       descInput.push = ()=>{data.description=descInput.value};
       descInput.onchange = ()=>{descInput.push()};
 
@@ -1457,6 +1463,7 @@ function updateControls(){
 
   let statusListDiv=document.createElement("DIV");
   let statusLabel=document.createElement("P");
+  statusLabel.classList.add("listTitle");
   statusLabel.innerHTML="statuses:";
   statusListDiv.appendChild(statusLabel);
 
@@ -1479,6 +1486,7 @@ function updateControls(){
     valInput.onchange = ()=>{valInput.push()};
 
     let remBtn=document.createElement("BUTTON");
+    remBtn.classList.add("bad");
     remBtn.innerHTML="remove";
     remBtn.onclick=()=>{deleteStatus(data); updateControls();};
 
@@ -1488,7 +1496,7 @@ function updateControls(){
     statusListDiv.appendChild(statusDiv);
   }
   let newStatBtn=document.createElement("BUTTON");
-  newStatBtn.classList.add("newStatus");
+  newStatBtn.classList.add("good");
   newStatBtn.innerHTML="add new status";
   newStatBtn.onclick=()=>{newStatus(); updateControls();};
 
@@ -1506,5 +1514,13 @@ function newStatus(){
   allStatuses.push(new Status());
 }
 function deleteStatus(toRemove){
+  nullEffect(toRemove);
   remove(allStatuses,toRemove);
+}
+//this will set the USId of the effect to an impossible value
+//this ensures a new status can never have the same USId as the deleted one
+function nullEffect(toNull){
+  if(toNull.USId){
+    toNull.USId=-1;
+  }
 }

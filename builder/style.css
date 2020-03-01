@@ -1,16 +1,66 @@
 body{
 	margin: 0;
+	font-family: 'Spartan', sans-serif;
 }
-.editTop{
-	padding-top: 10px;
-	padding-bottom: 10px;
-	display: flex;
-	justify-content: flex-start;
+canvas{
+	display: block;
+}
+button:focus {
+	outline:0;
+}
+input{
+    font-family: 'Montserrat', sans-serif;
+    margin-right:5px;
+    border-radius: 2px;
+    border: 1px solid #C0C0C0;
+    font-size: 0.9rem;
+
+	margin-bottom: 6px;
+}
+textarea{
+	font-family: 'Montserrat', sans-serif;
+    margin-right:5px;
+    border-radius: 2px;
+    border: 1px solid #C0C0C0;
+    font-size: 0.9rem;
+}
+select{
+    font-family: 'Montserrat', sans-serif;
+    margin-right:5px; 
+    border-radius: 2px;
+    border: 1px solid #C0C0C0;
+    font-size: 0.9rem;
 }
 .contain{
 	max-width: 1024px;
 	margin-right: auto;
 	margin-left: auto;
+}
+.editTop{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	display: flex;
+	justify-content: flex-end;
+}
+.editTop button,.editTop a{
+	font-size: 0.9rem;
+	font-family: 'Spartan', sans-serif;
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+.editTop a{
+	text-decoration: none;
+	padding: 4px 8px;
+	border-radius: 2px;
+
+	background: white;
+	color: black;
+	border: 1px solid black;
+}
+.editTop a:active,.editTop button:active{
+	border: 1px solid #0CD37A;
+	color: #0CD37A;
 }
 .editPanel{
 	display: flex;
@@ -23,9 +73,84 @@ body{
 }
 .editPanel p{
 	margin: 0;
-	margin-top: 10px;
+	margin-top: 4px;
 }
 .editPanel .info{
 	margin-top: 50px;
 	text-align: center;
+}
+.editMenu{
+	padding-top: 10px;
+	padding-bottom: 10px;
+	background-color: black;
+	display: flex;
+	justify-content: center;
+}
+.editMenu *{
+	margin-right: 20px;
+	margin-left: 20px;
+}
+.info{
+	color: #C0C0C0;
+}
+p.title{
+	margin-top: 25px;
+	font-size: 1.2rem;
+	font-weight: 600;
+}
+.title:after{
+    content: "";
+    display: block;
+    width: calc(100% - 20px);
+    border-bottom: 2px solid #C0C0C0;
+    margin-bottom: 8px;
+}
+.listTitle{
+	font-weight: 600;
+}
+button{
+	padding: 4px 8px;
+	border-radius: 2px;
+
+	background: white;
+	color: black;
+	border: 1px solid black;
+	font-family: 'Spartan', sans-serif;
+}
+button:active{
+	border: 1px solid #23FC9A;
+	color: #23FC9A;
+}
+button.bad{
+	color: #E01A21;
+	background-color: #E01A2120;
+	border-color: #E01A21;
+}
+button.bad:active{
+	color: #FF7575;
+	background-color: #FF757520;
+	border-color: #FF7575;
+}
+button.good{
+	color: #0CD37A;
+	background-color: #0CD37A20;
+	border-color: #0CD37A;
+}
+button.good:active{
+	color: #23FC9A;
+	background-color: #23FC9A20;
+	border-color: #23FC9A;
+}
+.editMenu button{
+	padding: 5px 10px;
+	border-radius: 3px;
+
+	background: none;
+	color: white;
+	border: 1px solid white;
+	font-family: 'Spartan', sans-serif;
+}
+.editMenu button:active{
+	border: 1px solid #23FC9A;
+	color: #23FC9A;
 }
